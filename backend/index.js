@@ -1,31 +1,39 @@
 const express = require('express');
-const bodyParser = require('body-parser');
+const cors = require('cors');
 const Caesar = require('caesar-salad').Caesar;
 
 const app = express();
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(cors());
 
 const port = 8000;
 
 
-app.post('/', (req, res) => {
-    if (!req.body.message || !req.body.crypt) {
+app.post('/encode', (req, res) => {
+    if (!req.body.message) {
         return res.status(400).send({error: 'Data not valid'});
     }
 
     const message = {
         message: req.body.message,
         password: req.body.password,
-        crypt: req.body.crypt,
     };
 
-    if (message.crypt === "encode") {
-        res.send(Caesar.Cipher(message.password).crypt(message.message));
+    res.send(Caesar.Cipher(message.password).crypt(message.message));
+
+});
+
+app.post('/decode', (req, res) => {
+    if (!req.body.message) {
+        return res.status(400).send({error: 'Data not valid'});
     }
 
-    if (message.crypt === "decode") {
-        res.send(Caesar.Decipher(message.password).crypt(message.message));
-    }
+    const message = {
+        message: req.body.message,
+        password: req.body.password,
+    };
+
+    res.send(Caesar.Decipher(message.password).crypt(message.message));
 });
 
 app.listen(port, () => {
